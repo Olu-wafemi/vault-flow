@@ -5,7 +5,8 @@ import {ConfigModule} from '@nestjs/config'
 import {TypeOrmModule} from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
 import { JwtStrategy } from './jwt.strategy/jwt.strategy';
-
+import { User } from './users/user.entity'; 
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
@@ -13,10 +14,12 @@ import { JwtStrategy } from './jwt.strategy/jwt.strategy';
     TypeOrmModule.forRoot({
       type:  'postgres',
       url: process.env.DATABASE_URL,
+      entities: [User],
       autoLoadEntities: true,
       synchronize: true
     }),
-    AuthModule
+    AuthModule,
+    UsersModule
   ],
   controllers: [AppController],
   providers: [AppService, JwtStrategy],

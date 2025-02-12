@@ -1,23 +1,28 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService} from "@nestjs/jwt"
 import * as bcryt from "bcrypt"
+import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class AuthService {
-    constructor(private readonly jwtService: JwtService) {}
+    constructor(
+        private readonly jwtService: JwtService,
+        private readonly userService: UsersService
+    ) {}
 
-    async hashPassword(password: string): Promise<string>{
-        const salt = await bcryt.genSalt(10);
-        return bcryt.hash(password, salt);
+    async signup(username: string, password: string){
+        return this.userService.CreateUser(username, password)
     }
+    async login(username: string, password: string){
+        const user = await  this.userService.findUserByUsername(username)
+        if(!user) return {message: "User not found"}
 
-    async comparePasswords(password: string, hashedPassword: string): Promise<boolean>{
-            const checkpassword =  bcryt.compare(password, hashedPassword);
-            return checkpassword
-    }
+        const isPasswordValid = await bcryt.compare(password, user.password);
+        if(!isPasswordValid) return { message: "Invalid Credentials"}
 
-    async generateToken(userId: string): Promise<string>{
-        return this.jwtService.sign({id: userId});
+        const token = this.jwtService.sign({id: user.id})
+        return {message : "Login successful", token}
     }
+   
 
 }
