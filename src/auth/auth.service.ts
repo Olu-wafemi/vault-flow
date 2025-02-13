@@ -1,6 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService} from "@nestjs/jwt"
-import * as bcryt from "bcrypt"
+import * as bcrypt from "bcrypt"
 import { UsersService } from 'src/users/users.service';
 
 @Injectable()
@@ -10,19 +10,54 @@ export class AuthService {
         private readonly userService: UsersService
     ) {}
 
+    async validateUser(username: string, password: string){
+        const user = await this.userService.findUserByUsername(username)
+        if(user && (await bcrypt.compare(user.password, password))){
+            return user;
+        }
+
+        throw new UnauthorizedException('Invalid Credentials')
+    }
+
     async signup(username: string, password: string){
-        return this.userService.CreateUser(username, password)
-    }
-    async login(username: string, password: string){
-        const user = await  this.userService.findUserByUsername(username)
-        if(!user) return {message: "User not found"}
 
-        const isPasswordValid = await bcryt.compare(password, user.password);
-        if(!isPasswordValid) return { message: "Invalid Credentials"}
+        const check_user = await this.userService.findUserByUsername(username)
+        if(!check_user){
+            const hashedPassword = await bcrypt.hash(password, 10)
+            const user = await this.userService.CreateUser(username, hashedPassword)
+            return { message: "Signup Successful", ...user}
+        }
+        throw new UnauthorizedException()
 
-        const token = this.jwtService.sign({id: user.id})
-        return {message : "Login successful", token}
     }
-   
+    async login(body: any){
+        const payload = {password: body.password, username: body.username}
+
+        const validate_user = await this.validateUser(payload.username, payload.password)
+        const accessToken = this.jwtService.sign(payload, {expiresIn: '15m'})
+        const refreshToken = this.jwtService.sign(payload, {expiresIn: '7d'})
+
+        const hashedRefreshToken = await bcrypt.hash(refreshToken,10);
+        await this.userService.updateRefreshToken(validate_user.id, hashedRefreshToken);
+        return {accessToken, refreshToken}
+    }
+
+    async refreshToken(userId: string, refreshToken: string){
+        const user = await this.userService.findOneById(userId)
+        if(!user || !user.refreshToken) throw new UnauthorizedException();
+
+        const isValid = await bcrypt.compare(refreshToken, user.refreshToken)
+        if(!isValid) throw new UnauthorizedException()
+
+            const payload = { sub: user.id, username: user.username}
+
+            const newAccessToken = this.jwtService.sign(payload, {expiresIn: '15m'})
+
+            return {accessToken: newAccessToken}
+    }
+
+    async logout( userId: string){
+        await this.userService.updateRefreshToken(userId, "")
+    }
 
 }

@@ -23,4 +23,12 @@ export class UsersService {
 
         return this.userRepo.findOne({where: {username}})
     }
+
+    async findOneById(userId: string){
+        return this.userRepo.findOne({where: {id: userId}})
+    }
+
+    async updateRefreshToken(id: string, token: string){
+        return this.userRepo.update(id,  {refreshToken: token})
+    }
 }
