@@ -8,6 +8,7 @@ import { JwtStrategy } from './jwt.strategy/jwt.strategy';
 import { User } from './users/user.entity'; 
 import { UsersModule } from './users/users.module';
 import { WalletModule } from './wallet/wallet.module';
+import { TransactionModule } from './transaction/transaction.module';
 
 @Module({
   imports: [
@@ -25,7 +26,8 @@ import { WalletModule } from './wallet/wallet.module';
     }),
     AuthModule,
     UsersModule,
-    WalletModule
+    WalletModule,
+    TransactionModule
   ],
   controllers: [AppController],
   providers: [AppService, JwtStrategy],

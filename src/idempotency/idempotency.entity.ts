@@ -15,6 +15,9 @@ export class IdempotencyRecord{
     @Column({type: 'varchar'})
     transactionType: string
 
+    @Column()
+    transactionId: string
+
     @Column({type: 'decimal', precision: 12, scale: 2, nullable:true})
     amount: number
 
