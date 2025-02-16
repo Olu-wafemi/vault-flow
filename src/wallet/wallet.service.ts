@@ -13,7 +13,7 @@ export class WalletService {
         private readonly idempotencyrecord: Repository<IdempotencyRecord>
         
     
-    ){}
+    ){} 
 
     async createWallet(userId: number, currency: string): Promise<Wallet>{
         const wallet = this.walletRepository.create({userId, currency, balance:0})
@@ -21,10 +21,10 @@ export class WalletService {
     }
     
     async getWalletsByUser(userId: number): Promise<Wallet[]>{
-        return this.walletRepository.find({where: {userId}})
+        return this.walletRepository.find({where: { userId: userId}})
     }
 
-    async deposit(walletid: string, amount: number, idempotencyKey: string): Promise<Wallet>{
+    async deposit(walletid: string, amount: number, idempotencyKey: string): Promise<Wallet | null>{
         if(amount <= 0){
             throw new BadGatewayException("Amount must be greater than zero")
         }
@@ -58,7 +58,7 @@ export class WalletService {
         })
     }
 
-    async withdraw(walletId: string, amount: number, idempotencyKey: string): Promise<Wallet>{
+    async withdraw(walletId: string, amount: number, idempotencyKey: string): Promise<Wallet| null>{
         if(amount <= 0){
             throw new BadRequestException("Amount must be greater than zero")
 
