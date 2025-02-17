@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Wallet } from './wallet.entity';
 import { DataSource, Repository, UpdateResult } from 'typeorm';
 import { IdempotencyRecord } from 'src/idempotency/idempotency.entity';
-import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
 
 @Injectable()
 export class WalletService {
@@ -22,12 +22,20 @@ export class WalletService {
         const savedWallet = await this.walletRepository.save(wallet);
         
 
-        await this.cacheManager.delete(`wallets:${userId}`);
+        await this.cacheManager.del(`wallets:${userId}`);
         return savedWallet;
     }
     
     async getWalletsByUser(userId: number): Promise<Wallet[]>{
-        return this.walletRepository.find({where: { userId: userId}})
+        const cacheKey = `wallets:{userId}`;
+        
+        let wallets = await this.cacheManager.get<Wallet[]>(cacheKey)
+        if(wallets){
+            return wallets
+        }
+        wallets = await this.walletRepository.find({where: {userId: userId}})
+        await this.cacheManager.set(cacheKey, wallets)
+        return  wallets
     }
 
     async deposit(walletid: string, amount: number, idempotencyKey: string): Promise<Wallet | null>{
