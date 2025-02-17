@@ -1,8 +1,9 @@
-import { BadGatewayException, BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadGatewayException, BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Wallet } from './wallet.entity';
 import { DataSource, Repository, UpdateResult } from 'typeorm';
 import { IdempotencyRecord } from 'src/idempotency/idempotency.entity';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
 
 @Injectable()
 export class WalletService {
@@ -10,14 +11,19 @@ export class WalletService {
         @InjectRepository(Wallet)
         private walletRepository: Repository<Wallet>,
         private dataSource: DataSource,
-        private readonly idempotencyrecord: Repository<IdempotencyRecord>
+        private readonly idempotencyrecord: Repository<IdempotencyRecord>,
+        @Inject(CACHE_MANAGER) private cacheManager: Cache
         
     
     ){} 
 
     async createWallet(userId: number, currency: string): Promise<Wallet>{
         const wallet = this.walletRepository.create({userId, currency, balance:0})
-        return this.walletRepository.save(wallet);
+        const savedWallet = await this.walletRepository.save(wallet);
+        
+
+        await this.cacheManager.delete(`wallets:${userId}`);
+        return savedWallet;
     }
     
     async getWalletsByUser(userId: number): Promise<Wallet[]>{
