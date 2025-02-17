@@ -49,7 +49,7 @@ export class WalletService {
         if(existingRecord){
             return this.walletRepository.findOne({where: {id: walletid}});
         }
-        return await this.dataSource.transaction(async (manager)=>{
+        const updatedWallet =  await this.dataSource.transaction(async (manager)=>{
             const wallet = await manager.findOne(Wallet, 
                 { where: {id: walletid},
                 lock: {mode: 'pessimistic_write'}
@@ -59,7 +59,7 @@ export class WalletService {
             }
 
             wallet.balance = Number(wallet.balance) + amount;
-            const updatedWallet = await manager.save(wallet)
+            const savedWallet = await manager.save(wallet)
 
             const record = manager.create(IdempotencyRecord,{
                 key: idempotencyKey,
@@ -68,8 +68,18 @@ export class WalletService {
                 amount
             })
             await manager.save(record)
-            return updatedWallet
+            return savedWallet
+            
         })
+        const walletEntity = await this.walletRepository.findOne({where:{ id: walletid}})
+        if (walletEntity){
+            await this.cacheManager.del(`wallets:${walletEntity?.userId}`)
+        }
+
+        return updatedWallet
+        
+
+      
     }
 
     async withdraw(walletId: string, amount: number, idempotencyKey: string): Promise<Wallet| null>{
