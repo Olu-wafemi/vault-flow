@@ -9,6 +9,8 @@ import { User } from './users/user.entity';
 import { UsersModule } from './users/users.module';
 import { WalletModule } from './wallet/wallet.module';
 import { TransactionModule } from './transaction/transaction.module';
+import { CurrencyService } from './currency/currency.service';
+import { CurrencyModule } from './currency/currency.module';
 
 @Module({
   imports: [
@@ -27,9 +29,10 @@ import { TransactionModule } from './transaction/transaction.module';
     AuthModule,
     UsersModule,
     WalletModule,
-    TransactionModule
+    TransactionModule,
+    CurrencyModule
   ],
   controllers: [AppController],
-  providers: [AppService, JwtStrategy],
+  providers: [AppService, JwtStrategy, CurrencyService],
 })
 export class AppModule {}
