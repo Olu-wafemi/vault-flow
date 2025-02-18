@@ -1,27 +1,35 @@
 import { Body, Controller, Get, Param, Post, Req } from '@nestjs/common';
 import { WalletService } from './wallet.service';
+import {MessagePattern, Payload} from "@nestjs/microservices"
+
 
 @Controller('wallet')
 export class WalletController {
     constructor(private walletService: WalletService){}
 
-    @Post()
-    async createWallet(@Body() body: {cuurency: string}, @Req() req){
-        return this.walletService.createWallet(req.user.id, body.cuurency)
+    @MessagePattern({cmd: 'createWallet'})
+    async createWallet(@Payload() data: {userId: number, cuurency: string}, ){
+        return this.walletService.createWallet(data.userId, data.cuurency)
     }
 
-    @Get()
-    async getUserWallets(@Req() req){
-        return this.walletService.getWalletsByUser(req.user.id);
+    @MessagePattern({cmd: 'getWallets'})
+    async getUserWallets(@Payload() data: { userId: number} ){
+        return this.walletService.getWalletsByUser(data.userId);
 
     }
 
-    @Post(":id/depost")
+    @MessagePattern({cmd: "deposit"})
     async deposit(
-        @Param('id') walletId: string,
-        @Body() body: { amount: number, idempotencyKey: string}
+        @Payload() data: {walletId: string, amount: number, idempotencyKey: string}
     ){
-        return this.walletService.withdraw(walletId, body.amount, body.idempotencyKey);
+        return this.walletService.withdraw(data.walletId, data.amount, data.idempotencyKey);
         
+    }
+
+    @MessagePattern({cmd: "withdraw"})
+    async withdrawal(
+        @Payload() data: { walletId: string, amount: number, idempotencyKey: string}
+    ){
+        return await this.walletService.withdraw(data.walletId, data.amount,data.idempotencyKey)
     }
 }
