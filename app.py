@@ -8,9 +8,16 @@ model = joblib.load("fraud_model.pkl")
 
 @app.route("/predict", methods= ["POST"])
 def predict():
+
     data = request.json
-    features = [data.get("amount"), data.get("time_diff"), data.get("transaction_count")]
-    features_array = np.array(features).reshape(1, -1)
+   
+    amount = data.get("Amount")
+    hour = data.get("Hour")
+
+    if amount is None or hour is None:
+        return jsonify({'error': 'Missing features'}), 400
+    
+    features_array = np.array([amount, hour]).reshape(1, -1)
 
 
 
