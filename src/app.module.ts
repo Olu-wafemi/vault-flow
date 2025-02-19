@@ -11,7 +11,10 @@ import { WalletModule } from './wallet/wallet.module';
 import { TransactionModule } from './transaction/transaction.module';
 import { CurrencyService } from './currency/currency.service';
 import { CurrencyModule } from './currency/currency.module';
+import { FraudDetectionModule } from './fraud-detection/fraud-detection.module';
 
+import { IdempotencyModule } from './idempotency/idempotency.module';
+import { HttpModule } from '@nestjs/axios';
 @Module({
   imports: [
     ConfigModule.forRoot({isGlobal: true}) ,
@@ -28,9 +31,12 @@ import { CurrencyModule } from './currency/currency.module';
     }),
     AuthModule,
     UsersModule,
-    WalletModule,
-    TransactionModule,
-    CurrencyModule
+  WalletModule,
+   TransactionModule,
+   CurrencyModule,
+    FraudDetectionModule,
+    IdempotencyModule,
+    HttpModule
   ],
   controllers: [AppController],
   providers: [AppService, JwtStrategy, CurrencyService],

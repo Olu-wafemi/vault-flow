@@ -6,14 +6,14 @@ import { lastValueFrom } from 'rxjs';
 @Injectable()
 export class CurrencyService {
     constructor(
-        private readonly httpService: HttpService,
-        @Inject(CACHE_MANAGER ) private cacheManager: Cache
+        private  httpService: HttpService,
+        //@Inject(CACHE_MANAGER ) private cacheManager: Cache
 
 
 
     ){}
 
-
+/*
 
     async getExchangerates(){
         let getrates: any
@@ -44,6 +44,6 @@ export class CurrencyService {
     
         }
     }
-
+*/
     
 }

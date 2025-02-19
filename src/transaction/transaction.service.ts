@@ -8,8 +8,7 @@ import {Transaction} from "./transaction.entity"
 export class TransactionService {
 
     constructor(
-        @InjectRepository(Wallet)
-        private walletRepo: Repository<Wallet>,
+        
         @InjectRepository(Transaction)
         private transactionRepo: Repository<Transaction>,
         @InjectRepository(IdempotencyRecord)

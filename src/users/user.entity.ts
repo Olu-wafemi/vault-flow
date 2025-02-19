@@ -1,4 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
+import { Wallet } from "src/wallet/wallet.entity";
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from "typeorm";
 
 
 export enum UserRole{
@@ -18,6 +19,9 @@ export class User {
 
     @Column({nullable: true})
     refreshToken: string
+
+    // @OneToMany(() => Wallet)
+    // wallet: Wallet
 
     @Column({type: "enum", enum: UserRole, default: UserRole.USER})
     roles: UserRole;

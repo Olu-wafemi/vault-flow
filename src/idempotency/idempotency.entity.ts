@@ -1,7 +1,8 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn } from "typeorm";
 
-@Entity()
 
+
+@Entity()
 export class IdempotencyRecord{
     @PrimaryGeneratedColumn('uuid')
     id: String;

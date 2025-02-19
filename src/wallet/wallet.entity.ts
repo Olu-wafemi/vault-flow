@@ -2,6 +2,7 @@
 import {Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn} from 'typeorm';
 
 import { User } from 'src/users/user.entity';
+import { forwardRef } from '@nestjs/common';
 
 
 
@@ -17,7 +18,7 @@ export class Wallet{
     currency: string
 
 
-    @ManyToOne(() => User)
+    @ManyToOne(()  => User)
     @JoinColumn({name: 'userId'})
     user: User;
 
