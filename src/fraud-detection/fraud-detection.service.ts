@@ -40,7 +40,7 @@ export class FraudDetectionService {
 
             const probability = response.data.probability
             return probability[1]
-
+9
         }
         catch(error){
             this.logger.error("Error calling prediction service", error)
@@ -49,7 +49,18 @@ export class FraudDetectionService {
         
     }
 
-    async 
+    async handleTransactionEvent(transaction: TransactionEvent): Promise<void>{
+        this.logger.log(`Proceesing transaction: ${transaction.transactionId}`);
+        const fraudProbability = await this.predictFraudFromModel(transaction)
+        this.logger.log(`Fraud Probabilty for transaction ${transaction.transactionId}: ${fraudProbability.toFixed(2)}`)
+
+        if(fraudProbability >= this.fraudThreshold){
+            this.logger.warn(`Transaction ${transaction.transactionId} flagged as suspicious`)
+
+        }else{
+            this.logger.log(`Transaction ${transaction.transactionId} appears normal`)
+        }
+    }
 
     
 }
