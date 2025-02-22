@@ -16,7 +16,7 @@ describe('AuthService', () => {
 
     const usersServiceMock = {
       findUserByUsername: jest.fn(),
-      createUser: jest.fn(),
+      CreateUser: jest.fn(),
       findOneById: jest.fn(),
       updateRefreshToken: jest.fn()
 
@@ -71,5 +71,18 @@ describe('AuthService', () => {
     })
 
     
+  });
+
+  describe("signup", ()=>{
+    it("should call createUser on UsersService and return its result", async()=>{
+
+       (usersService.findUserByUsername as jest.Mock).mockResolvedValue("");
+       const user =  {username: "test", password: "test"};
+       (usersService.CreateUser as jest.Mock).mockResolvedValue(undefined);
+       const result = await authService.signup("test", "test");
+       expect(result).toHaveProperty("message", "Signup Successful")
+
+
+    })
   })
 });
