@@ -84,5 +84,10 @@ describe('AuthService', () => {
 
 
     })
+
+    it("should throw error if user exists already", async()=>{
+      (usersService.findUserByUsername as jest.Mock).mockResolvedValue({username: "test", password:"test"});
+      await expect(authService.signup("test", "test")).rejects.toThrow(new UnauthorizedException());
+    })
   })
 });
