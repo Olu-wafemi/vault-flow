@@ -72,4 +72,16 @@ describe('UsersService', () => {
       expect(result).toHaveProperty("username", "test")
     })
   })
+
+  describe("Update Refresh Token", ()=>{
+
+    it("should update the user repo with a new refresh Token", async ()=>{
+
+      (usersRepo.update as jest.Mock).mockResolvedValue({"username": "test", refreshToken: "123456"});
+
+      const result = await usersService.updateRefreshToken("12345", "1234567")
+
+      expect(result).toHaveProperty("refreshToken","123456")
+    })
+  })
 });
