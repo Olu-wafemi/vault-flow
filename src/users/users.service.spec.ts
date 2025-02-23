@@ -50,4 +50,26 @@ describe('UsersService', () => {
     
     })
   })
+
+  describe("FindUserByUsername", ()=>{
+    it("should find user call find a user by the username", async()=>{
+
+      (usersRepo.findOne as jest.Mock).mockResolvedValue({username: "test", password: "test"});
+
+      const result = await usersService.findUserByUsername("test");
+      expect(result).toHaveProperty("username", "test")
+
+    })
+  })
+
+  describe("FindOneById", ()=>{
+    it("Should return a user details if the user id exists", async()=>{
+
+      (usersRepo.findOne as jest.Mock).mockResolvedValue({username: "test", password: "test"})
+
+      const result = await usersService.findOneById("12345")
+
+      expect(result).toHaveProperty("username", "test")
+    })
+  })
 });
