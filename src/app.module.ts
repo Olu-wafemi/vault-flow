@@ -31,7 +31,7 @@ import { HttpModule } from '@nestjs/axios';
     }),
     AuthModule,
     UsersModule,
-  WalletModule,
+    WalletModule,
    TransactionModule,
    CurrencyModule,
     FraudDetectionModule,

@@ -7,13 +7,13 @@ import { lastValueFrom } from 'rxjs';
 export class CurrencyService {
     constructor(
         private  httpService: HttpService,
-        //@Inject(CACHE_MANAGER ) private cacheManager: Cache
+        @Inject(CACHE_MANAGER ) private cacheManager: Cache
 
 
 
     ){}
 
-/*
+
 
     async getExchangerates(){
         let getrates: any
@@ -44,6 +44,6 @@ export class CurrencyService {
     
         }
     }
-*/
+
     
 }
