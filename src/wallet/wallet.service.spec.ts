@@ -119,10 +119,26 @@ describe('WalletService', () => {
       const amount = 0
       const walletid = "1234"
       const idempotencykey = "123456"
-
-
+      
       await expect(walletService.deposit(walletid,amount, idempotencykey)).rejects.toThrow(new BadGatewayException("Amount must be greater than zero"))
+    })
 
+    it("should check idempotency record to see if transaction exists", async()=>{
+      const walletid = "Wallet1"
+      const amount = 400
+      const idempotencyKey = "testkey"
+      const transactionType= "deposit"
+      const record = {id: "Record1", idempotencyKey ,walletid, transactionType, transactionId: "testtx", amount };
+      const userwallet = {id: "wallet1", balance: 5000, currency: "NGN", userId: 1234};
+      IdempotencyRepoMock.findOne.mockResolvedValue(record);
+      walletRepoMock.findOne.mockResolvedValue(userwallet)
+
+      const result = await walletService.deposit(walletid, amount, idempotencyKey)
+
+      expect(IdempotencyRepoMock.findOne).toHaveBeenCalledWith({where: {key: idempotencyKey, walletId: walletid, transactionType}})
+      expect(walletRepoMock.findOne).toHaveBeenCalledWith({where: {id: walletid}})
+
+      expect(result).toEqual(userwallet)
 
     })
   })

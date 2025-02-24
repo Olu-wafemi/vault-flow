@@ -41,7 +41,6 @@ export class WalletService {
         if(amount <= 0){
             throw new BadGatewayException("Amount must be greater than zero")
         }
-
         const existingRecord = await this.idempotencyrecord.findOne({
             where: {key: idempotencyKey,walletId: walletid, transactionType: 'deposit' }
         })
