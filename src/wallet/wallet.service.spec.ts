@@ -6,7 +6,7 @@ import { Wallet } from './wallet.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import {  Cache, CACHE_MANAGER } from '@nestjs/cache-manager';
 import { execOnce } from 'next/dist/shared/lib/utils';
-import { BadGatewayException } from '@nestjs/common';
+import { BadGatewayException, NotFoundException } from '@nestjs/common';
 
 describe('WalletService', () => {
  
@@ -140,6 +140,19 @@ describe('WalletService', () => {
 
       expect(result).toEqual(userwallet)
 
+    })
+
+    it("should throw NotFoundException if wallet is not found", async()=>{
+
+      IdempotencyRepoMock.findOne.mockResolvedValue(undefined);
+      dataSourceMock.transaction.mockImplementation(async(callback)=>{
+        return await callback({
+          findOne: jest.fn().mockResolvedValue(null),
+          save: jest.fn(),
+          create: jest.fn()
+        })
+      })
+      expect(walletService.deposit( "Wallets1", 500, "2345")).rejects.toThrow(new NotFoundException("Wallet Not Found"))
     })
   })
 
