@@ -154,6 +154,29 @@ describe('WalletService', () => {
       })
       expect(walletService.deposit( "Wallets1", 500, "2345")).rejects.toThrow(new NotFoundException("Wallet Not Found"))
     })
+
+    it("should deposit amount and record idempotency record", async()=>{
+      const wallet = {id: "wallet1", balance: 5000, currency: "NGN", userId: 1234};
+      const updatedwallet = {...wallet, balance: 6000}
+      IdempotencyRepoMock.findOne.mockResolvedValue(undefined);
+      dataSourceMock.transaction.mockImplementation(async(callback)=>{
+
+        const fakeManager = {
+          findOne: jest.fn().mockResolvedValue(wallet),
+          save: jest.fn().mockImplementation((entity)=> entity),
+          create: jest.fn((Entity, data)=> data)
+        }
+        return await callback(fakeManager)   
+      })
+
+      walletRepoMock.findOne.mockResolvedValue(updatedwallet)
+      cacheMangerMock.del.mockResolvedValue(true)
+
+      const result = await walletService.deposit("wallet1", 1000,"testkey")
+
+      expect(result).toEqual(updatedwallet);
+      expect(cacheMangerMock.del).toHaveBeenCalledWith(`wallets:${updatedwallet.userId}`)
+    })
   })
 
   
