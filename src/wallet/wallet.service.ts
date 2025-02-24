@@ -2,7 +2,7 @@ import { BadGatewayException, BadRequestException, Inject, Injectable, NotFoundE
 import { InjectRepository } from '@nestjs/typeorm';
 import { Wallet } from './wallet.entity';
 import { DataSource, Repository } from 'typeorm';
-import { IdempotencyRecord } from 'src/idempotency/idempotency.entity';
+import { IdempotencyRecord } from '../idempotency/idempotency.entity';
 import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
 
 @Injectable()
@@ -11,6 +11,7 @@ export class WalletService {
         @InjectRepository(Wallet)
         private walletRepository: Repository<Wallet>,
         private dataSource: DataSource,
+        @InjectRepository(IdempotencyRecord)
        private idempotencyrecord: Repository<IdempotencyRecord>,
         @Inject(CACHE_MANAGER) private cacheManager: Cache 
     ){} 

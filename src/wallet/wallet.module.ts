@@ -5,9 +5,10 @@ import { WalletService } from './wallet.service';
 import { WalletController } from './wallet.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Wallet } from './wallet.entity';
-import { IdempotencyRecord } from 'src/idempotency/idempotency.entity';
+import { IdempotencyRecord } from '../idempotency/idempotency.entity';
 import { DataSource, Repository } from 'typeorm';
-import { IdempotencyModule } from 'src/idempotency/idempotency.module';
+import { IdempotencyModule } from '../idempotency/idempotency.module';
+import { User } from 'src/users/user.entity';
 
 @Module({
   imports: [CacheModule.register({
@@ -15,10 +16,10 @@ import { IdempotencyModule } from 'src/idempotency/idempotency.module';
     isGlobal: true
 
   }),
-  TypeOrmModule.forFeature([Wallet, IdempotencyRecord]), IdempotencyModule]
+  TypeOrmModule.forFeature([Wallet, IdempotencyRecord, User]), IdempotencyModule]
   , 
   
-  providers: [WalletService, Repository],
+  providers: [WalletService],
   controllers: [WalletController],
   exports: [WalletService]
 

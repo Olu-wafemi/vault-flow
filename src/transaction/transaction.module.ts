@@ -3,7 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { TransactionService } from './transaction.service';
 import { TransactionController } from './transaction.controller';
-import { IdempotencyRecord } from 'src/idempotency/idempotency.entity';
+import { IdempotencyRecord } from '../idempotency/idempotency.entity';
 import { Transaction } from './transaction.entity';
 
 @Module({
