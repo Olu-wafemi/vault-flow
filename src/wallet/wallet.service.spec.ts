@@ -5,6 +5,7 @@ import { IdempotencyRecord } from '../idempotency/idempotency.entity';
 import { Wallet } from './wallet.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import {  Cache, CACHE_MANAGER } from '@nestjs/cache-manager';
+import { execOnce } from 'next/dist/shared/lib/utils';
 
 describe('WalletService', () => {
  
@@ -14,10 +15,6 @@ describe('WalletService', () => {
     let idempotencyRecord: Repository<IdempotencyRecord>;
     let walletRepository: Repository<Wallet>;
     let cacheManager:  Cache;
-
-
-
-  beforeEach(async () => {
 
     const walletRepoMock = {
       create: jest.fn(),
@@ -44,6 +41,12 @@ describe('WalletService', () => {
       set: jest.fn()
     }
 
+
+
+  beforeEach(async () => {
+
+  
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [WalletService,
       
@@ -66,15 +69,50 @@ describe('WalletService', () => {
 
   describe("Create Wallet", ()=>{
     it("Should create a wallet", async()=>{
-      const wallet = {userId: "12345", currency: "USD", balance: 0};
-      (walletRepository.create as jest.Mock).mockResolvedValue(wallet);
-      (walletRepository.save as jest.Mock).mockResolvedValue(wallet);
+      const wallet = {userId: 12345, currency: "USD", balance: 0};
+      walletRepoMock.create.mockResolvedValue(wallet);
+      walletRepoMock.save.mockResolvedValue(wallet);
+      cacheMangerMock.del.mockResolvedValue(true);
 
-      const result = await walletService.createWallet(12345, "NGN");
+
+      const result = await walletService.createWallet(12345, "USD");
       
-      expect(result).toHaveProperty("userId", "12345")
+      expect(walletRepoMock.create).toHaveBeenCalledWith(wallet);
+      expect(result).toHaveProperty("userId", 12345)
     })
   }) 
+
+  describe("getWalletsByUser", ()=>{
+    it("should return list of wallets in cache", async()=>{
+      const userId = 1234;
+
+      const userwallet = [{id: "wallet1", userId, currecny: "USD", balance: 0}]
+      cacheMangerMock.get.mockResolvedValue(userwallet)
+      const result = await walletService.getWalletsByUser(userId);
+      expect(cacheMangerMock.get).toHaveBeenCalledWith(`wallets:${userId}`)
+      expect(result).toEqual(userwallet)
+
+
+
+    })
+    it("should fetch from databse if not available in cache", async()=>{
+      const userId = 123
+      const userwallets = [{id: "wallet1", userId, currency: "NGN", balance: 50000}];
+
+      cacheMangerMock.get.mockResolvedValue(undefined);
+      walletRepoMock.find.mockResolvedValue(userwallets)
+      cacheMangerMock.set(true)
+
+      const result = await walletService.getWalletsByUser(userId);
+
+      expect(walletRepoMock.find).toHaveBeenCalledWith({"where": {"userId": userId}})
+      expect(result).toEqual(userwallets)
+
+
+
+
+    })
+  })
 
   
 });
