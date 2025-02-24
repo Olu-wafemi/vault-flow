@@ -1,12 +1,12 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { WalletService } from './wallet.service';
-import { DataSource, Repository } from 'typeorm';
+import { DataSource, Entity, Repository } from 'typeorm';
 import { IdempotencyRecord } from '../idempotency/idempotency.entity';
 import { Wallet } from './wallet.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import {  Cache, CACHE_MANAGER } from '@nestjs/cache-manager';
 import { execOnce } from 'next/dist/shared/lib/utils';
-import { BadGatewayException, NotFoundException } from '@nestjs/common';
+import { BadGatewayException, BadRequestException, NotFoundException } from '@nestjs/common';
 
 describe('WalletService', () => {
  
@@ -177,6 +177,65 @@ describe('WalletService', () => {
       expect(result).toEqual(updatedwallet);
       expect(cacheMangerMock.del).toHaveBeenCalledWith(`wallets:${updatedwallet.userId}`)
     })
+  })
+
+  describe("Withdrawal", ()=>{
+
+    it("should throw error on Invalid withdrawal amouunt" ,async()=>{
+      await  expect( walletService.withdraw("wallet1", -2300, "testkey")).rejects.toThrow(new BadRequestException("Amount must be greater than zero"))
+    })
+
+    it("should return present state of wallet if idempotencykey is found", async()=>{
+      const walletid = "Wallet1"
+      const amount = 400
+      const idempotencyKey = "testkey"
+      const transactionType= "withdraw"
+      const record = {id: "Record1", idempotencyKey ,walletid, transactionType, transactionId: "testtx", amount };
+      const userwallet = {id: "wallet1", balance: 5000, currency: "NGN", userId: 1234};
+     
+      IdempotencyRepoMock.findOne.mockResolvedValue(record)
+      walletRepoMock.findOne.mockResolvedValue(userwallet)
+
+      const result = await walletService.withdraw(walletid, amount, idempotencyKey);
+      expect(IdempotencyRepoMock.findOne).toHaveBeenCalledWith({where: {key: idempotencyKey, walletId: walletid, transactionType,}})
+      expect(walletRepoMock.findOne).toHaveBeenCalledWith({where: {id: walletid}})
+    })
+    it("should create a withdrawal and update idempotency record", async()=>{
+      const wallet =  {id: "wallet1", balance: 5000, currency: "NGN", userId: 1234};
+      const updatedwallet = {...wallet, balance: 4000}
+
+      IdempotencyRepoMock.findOne.mockResolvedValue(undefined)
+
+
+      dataSourceMock.transaction.mockImplementation(async(callback)=>{
+
+        const fakeManager = {
+          findOne: jest.fn().mockResolvedValue(wallet),
+          create: jest.fn((Entity, data)=> (data)),
+          save: jest.fn().mockImplementation((entity)=> (entity))
+        }
+        return callback(fakeManager)
+        
+      })
+
+      walletRepoMock.findOne.mockResolvedValue(updatedwallet)
+      cacheMangerMock.del.mockResolvedValue(true)
+
+      const result = await walletService.withdraw("wallet1", 1000, "testkey")
+
+      expect(walletRepoMock.findOne).toHaveBeenCalledWith({where: {id: "wallet1"}})
+      expect(cacheMangerMock.del).toHaveBeenCalledWith(`wallets:${updatedwallet.userId}`)
+      expect(result).toEqual(updatedwallet)
+
+      
+
+      
+
+
+
+
+    })
+
   })
 
   
