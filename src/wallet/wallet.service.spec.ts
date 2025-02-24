@@ -6,6 +6,7 @@ import { Wallet } from './wallet.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import {  Cache, CACHE_MANAGER } from '@nestjs/cache-manager';
 import { execOnce } from 'next/dist/shared/lib/utils';
+import { BadGatewayException } from '@nestjs/common';
 
 describe('WalletService', () => {
  
@@ -105,10 +106,22 @@ describe('WalletService', () => {
 
       const result = await walletService.getWalletsByUser(userId);
 
-      expect(walletRepoMock.find).toHaveBeenCalledWith({"where": {"userId": userId}})
+      expect(walletRepoMock.find).toHaveBeenCalledWith({where: { userId}})
+      expect(cacheMangerMock.get).toHaveBeenCalledWith(`wallets:${userId}`)
       expect(result).toEqual(userwallets)
 
+    })
+  })
 
+  describe("deposit", ()=>{
+
+    it("should return error if the amount is less than or equal to zero", async()=>{
+      const amount = 0
+      const walletid = "1234"
+      const idempotencykey = "123456"
+
+
+      await expect(walletService.deposit(walletid,amount, idempotencykey)).rejects.toThrow(new BadGatewayException("Amount must be greater than zero"))
 
 
     })
