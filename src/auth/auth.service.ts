@@ -12,19 +12,18 @@ export class AuthService {
 
     async validateUser(username: string, password: string){
         const user = await this.userService.findUserByUsername(username)
-        if(user && (await bcrypt.compare(user.password, password))){
+        if(user && (await bcrypt.compare(password, user?.password))){
             return user;
         }
-
         throw new UnauthorizedException('Invalid Credentials')
-    }
+}
 
     async signup(username: string, password: string){
 
         const check_user = await this.userService.findUserByUsername(username)
+
         if(!check_user){
-            const hashedPassword = await bcrypt.hash(password, 10)
-            const user = await this.userService.CreateUser(username, hashedPassword)
+            const user = await this.userService.CreateUser(username, password)
             return { message: "Signup Successful", ...user}
         }
         throw new UnauthorizedException()

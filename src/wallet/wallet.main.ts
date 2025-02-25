@@ -15,5 +15,6 @@ async function bootstrap(){
 })
 
  await app.listen()
+ console.log("Wallet Microservice is listening")
 }
 bootstrap()
