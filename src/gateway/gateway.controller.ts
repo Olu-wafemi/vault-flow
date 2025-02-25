@@ -26,6 +26,9 @@ export class GatewayController{
     @Get()
     async getWallets(@Query("userId") userId: number){
         const pattern = {cmd: "getWallets"}
+        const payload = {userId: Number(userId)};
+        const result = await lastValueFrom(this.client.send(pattern, payload))
+        return result;
     }
 
 }
