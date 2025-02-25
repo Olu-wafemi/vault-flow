@@ -2,14 +2,14 @@ import {Controller, Post, Get, Body, Query} from "@nestjs/common"
 import { ClientProxy, ClientProxyFactory,Transport } from "@nestjs/microservices"
 import { lastValueFrom } from "rxjs"
 
-@Controller('wallets')
+@Controller('wallet')
 export class GatewayController{
     private client: ClientProxy
     constructor(){
         this.client = ClientProxyFactory.create({
             transport: Transport.TCP,
             options:{
-                host: "localhost",
+                host: "0.0.0.0",
                 port: 3001
             }
         })
