@@ -18,19 +18,19 @@ export class AuthService {
         throw new UnauthorizedException('Invalid Credentials')
 }
 
-    async signup(username: string, password: string){
+    async signup(email: string, username: string, password: string){
 
         const check_user = await this.userService.findUserByUsername(username)
 
         if(!check_user){
-            const user = await this.userService.CreateUser(username, password)
+            const user = await this.userService.CreateUser(email, username, password)
             return { message: "Signup Successful", ...user}
         }
         throw new UnauthorizedException()
 
     }
     async login(body: any){
-        const payload = {password: body.password, username: body.username}
+        const payload = {email: body.email, username: body.username, password: body.password}
 
         const validate_user = await this.validateUser(payload.username, payload.password)
         const accessToken = this.jwtService.sign(payload, {expiresIn: '15m'})

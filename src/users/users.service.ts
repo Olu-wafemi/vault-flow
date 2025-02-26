@@ -11,10 +11,10 @@ export class UsersService {
 
 
 
-    async CreateUser(username: string, password: string ):Promise<User> {
+    async CreateUser(email: string, username: string, password: string ):Promise<User> {
 
         const hashedPassword = await bcrypt.hash(password, 10)
-        const user = this.userRepo.create({username, password: hashedPassword});
+        const user = this.userRepo.create({email, username, password: hashedPassword});
         return this.userRepo.save(user)
 
     }

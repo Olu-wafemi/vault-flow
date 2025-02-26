@@ -16,7 +16,7 @@ export class WalletService {
         @Inject(CACHE_MANAGER) private cacheManager: Cache 
     ){} 
 
-    async createWallet(userId: number, currency: string): Promise<Wallet>{
+    async createWallet(userId: string, currency: string): Promise<Wallet>{
         const wallet = this.walletRepository.create({userId, currency, balance:0})
         const savedWallet = this.walletRepository.save(wallet);
         
@@ -25,7 +25,7 @@ export class WalletService {
         return savedWallet;
     }
     
-    async getWalletsByUser(userId: number): Promise<Wallet[]>{
+    async getWalletsByUser(userId: string): Promise<Wallet[]>{
         const cacheKey = `wallets:${userId}`;
         
         let wallets = await this.cacheManager.get<Wallet[]>(cacheKey)

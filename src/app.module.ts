@@ -12,7 +12,7 @@ import { TransactionModule } from './transaction/transaction.module';
 import { CurrencyService } from './currency/currency.service';
 import { CurrencyModule } from './currency/currency.module';
 import { FraudDetectionModule } from './fraud-detection/fraud-detection.module';
-
+import { GatewayModule } from './gateway/gateway.module';
 import { IdempotencyModule } from './idempotency/idempotency.module';
 import { HttpModule } from '@nestjs/axios';
 @Module({
@@ -36,7 +36,8 @@ import { HttpModule } from '@nestjs/axios';
     CurrencyModule,
     FraudDetectionModule,
     IdempotencyModule,
-    HttpModule
+    HttpModule,
+    GatewayModule
   ],
   controllers: [AppController],
   providers: [AppService, JwtStrategy, CurrencyService],

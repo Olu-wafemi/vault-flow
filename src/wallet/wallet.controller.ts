@@ -8,12 +8,12 @@ export class WalletController {
     constructor(private walletService: WalletService){}
 
     @MessagePattern({cmd: 'createWallet'})
-    async createWallet(@Payload() data: {userId: number, cuurency: string}, ){
-        return this.walletService.createWallet(data.userId, data.cuurency)
+    async createWallet(@Payload() data: {userId: string, curency: string}, ){
+        return this.walletService.createWallet(data.userId, data.curency)
     }
 
     @MessagePattern({cmd: 'getWallets'})
-    async getUserWallets(@Payload() data: { userId: number} ){
+    async getUserWallets(@Payload() data: { userId: string} ){
         return this.walletService.getWalletsByUser(data.userId);
 
     }

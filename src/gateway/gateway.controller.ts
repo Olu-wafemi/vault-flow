@@ -9,7 +9,7 @@ export class GatewayController{
         this.client = ClientProxyFactory.create({
             transport: Transport.TCP,
             options:{
-                host: "0.0.0.0",
+                host: "localhost",
                 port: 3001
             }
         })

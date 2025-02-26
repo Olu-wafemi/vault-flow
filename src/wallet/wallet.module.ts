@@ -23,7 +23,8 @@ import { User } from 'src/users/user.entity';
     username: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
-    entities: [User],
+    autoLoadEntities: true,
+    //entities: [Wallet, User],
     synchronize: true
     
   }),
