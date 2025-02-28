@@ -10,7 +10,7 @@ export class TransactionHistoryService {
         @InjectRepository(TransactionHistory) 
         private readonly transactionRepo : Repository<TransactionHistory> ){}
 
-        async storeEvent(event: Partial<TransactionHistory> ): Promise<TransactionHistory>{
+        async createTransaction(event: Partial<TransactionHistory> ): Promise<TransactionHistory>{
             const record =  await this.transactionRepo.create(event)
             const savedRecord = await this.transactionRepo.save(record)
             this.logger.log(`Transaction recorded: ${savedRecord.id}`)
