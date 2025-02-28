@@ -1,27 +1,24 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { TransactionHistory } from './transaction-history.entity';
 
 @Injectable()
 export class TransactionHistoryService {
-
+    private readonly logger =  new Logger(TransactionHistoryService.name);
     constructor(
         @InjectRepository(TransactionHistory) 
         private readonly transactionRepo : Repository<TransactionHistory> ){}
 
-        async storeEvent(userId: string, type: string, amount: number, fromwalletId?: string, toWalletId?: string  ){
-            return await this.transactionRepo.create({
-                userId: userId,
-                amount: amount,
-                fromWalletId: fromwalletId,
-                toWalletId: toWalletId,
-                type: type
-
-            })
+        async storeEvent(event: Partial<TransactionHistory> ): Promise<TransactionHistory>{
+            const record =  await this.transactionRepo.create(event)
+            const savedRecord = await this.transactionRepo.save(record)
+            this.logger.log(`Transaction recorded: ${savedRecord.id}`)
+            return savedRecord
         }
 
-        async getTransactionHistory( userId: string){
-            return await this.transactionRepo.findOne({where:{ userId}})
+        async getTransactionsByUser( userId: string){
+            return await this.transactionRepo.find({where:{ userId},
+            order: {timestamp: "DESC"}})
         }
 }
