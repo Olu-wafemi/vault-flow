@@ -9,6 +9,7 @@ import { IdempotencyRecord } from '../idempotency/idempotency.entity';
 import { DataSource, Repository } from 'typeorm';
 import { IdempotencyModule } from '../idempotency/idempotency.module';
 import { User } from 'src/users/user.entity';
+import { ClientKafka, ClientsModule, Transport } from '@nestjs/microservices';
 
 @Module({
   imports: [CacheModule.register({
@@ -28,8 +29,27 @@ import { User } from 'src/users/user.entity';
     synchronize: true
     
   }),
-  TypeOrmModule.forFeature([Wallet, IdempotencyRecord, User]), IdempotencyModule, ]
+  TypeOrmModule.forFeature([Wallet, IdempotencyRecord, User]),
+  ClientsModule.register([
+    {
+      name: "KAFKA_SERVICE",
+      transport: Transport.KAFKA,
+      options:{
+        client:{
+          clientId: 'wallet-service',
+          brokers: ['localhost: 9092']
+        },
+        consumer:{
+          groupId: 'wallet-consumer'
+        }
+      }
+    }
+  ])
+
+
+]
   , 
+  
   
   providers: [WalletService],
   controllers: [WalletController],

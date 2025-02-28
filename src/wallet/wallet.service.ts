@@ -4,6 +4,8 @@ import { Wallet } from './wallet.entity';
 import { DataSource, Repository } from 'typeorm';
 import { IdempotencyRecord } from '../idempotency/idempotency.entity';
 import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
+import { ClientKafka } from '@nestjs/microservices';
+
 
 @Injectable()
 export class WalletService {
@@ -13,7 +15,8 @@ export class WalletService {
         private dataSource: DataSource,
         @InjectRepository(IdempotencyRecord)
        private idempotencyrecord: Repository<IdempotencyRecord>,
-        @Inject(CACHE_MANAGER) private cacheManager: Cache 
+        @Inject(CACHE_MANAGER) private cacheManager: Cache ,
+        @Inject('KAFKA_SERVICE') private readonly kafkaClient: ClientKafka
     ){} 
 
     async createWallet(userId: string, currency: string): Promise<Wallet>{
@@ -74,6 +77,14 @@ export class WalletService {
             await this.cacheManager.del(`wallets:${walletEntity?.userId}`)
         }
 
+        this.kafkaClient.emit('tranaction_event',{
+            userid: walletEntity?.userId,
+            type: 'deposit',
+            walletid,
+            amount,
+            timestamp: new Date()
+        })
+
         return updatedWallet
         
 
@@ -126,6 +137,15 @@ export class WalletService {
         if(walletEntity){
             await this.cacheManager.del(`wallets:${walletEntity.id}`)
         }
+
+        this.kafkaClient.emit('transaction_event', {
+            userId : walletEntity?.userId,
+            walletId,
+            type: "withdraw",
+            amount,
+            timestamp: new Date()
+            
+        })
         return updatedWallet
     }
 
