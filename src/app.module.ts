@@ -15,6 +15,7 @@ import { FraudDetectionModule } from './fraud-detection/fraud-detection.module';
 import { GatewayModule } from './gateway/gateway.module';
 import { IdempotencyModule } from './idempotency/idempotency.module';
 import { HttpModule } from '@nestjs/axios';
+import { TransactionHistoryModule } from './transaction-history/transaction-history.module';
 @Module({
   imports: [
     ConfigModule.forRoot({isGlobal: true}) ,
@@ -37,7 +38,8 @@ import { HttpModule } from '@nestjs/axios';
     FraudDetectionModule,
     IdempotencyModule,
     HttpModule,
-    GatewayModule
+    GatewayModule,
+    TransactionHistoryModule
   ],
   controllers: [AppController],
   providers: [AppService, JwtStrategy, CurrencyService],
