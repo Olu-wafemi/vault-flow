@@ -76,7 +76,7 @@ describe('WalletService', () => {
       cacheMangerMock.del.mockResolvedValue(true);
 
 
-      const result = await walletService.createWallet(12345, "USD");
+      const result = await walletService.createWallet("12345", "USD");
       
       expect(walletRepoMock.create).toHaveBeenCalledWith(wallet);
       expect(result).toHaveProperty("userId", 12345)
@@ -85,7 +85,7 @@ describe('WalletService', () => {
 
   describe("getWalletsByUser", ()=>{
     it("should return list of wallets in cache", async()=>{
-      const userId = 1234;
+      const userId = "1234";
 
       const userwallet = [{id: "wallet1", userId, currecny: "USD", balance: 0}]
       cacheMangerMock.get.mockResolvedValue(userwallet)
@@ -97,7 +97,7 @@ describe('WalletService', () => {
 
     })
     it("should fetch from databse if not available in cache", async()=>{
-      const userId = 123
+      const userId = "123"
       const userwallets = [{id: "wallet1", userId, currency: "NGN", balance: 50000}];
 
       cacheMangerMock.get.mockResolvedValue(undefined);
