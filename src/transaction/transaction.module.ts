@@ -7,9 +7,24 @@ import { IdempotencyRecord } from '../idempotency/idempotency.entity';
 import { Transaction } from './transaction.entity';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([Transaction,IdempotencyRecord])],
+
+    imports: [
+        TypeOrmModule.forRoot({
+            type: 'postgres',
+            host: process.env.DB_HOST,
+            port: parseInt(process.env.DB_PORT!),
+            username: process.env.DB_USER,
+            password: process.env.DB_PASSWORD,
+            database: process.env.DB_NAME,
+            autoLoadEntities: true,
+            //entities: [Wallet, User],
+            synchronize: true
+
+        }),
+
+        TypeOrmModule.forFeature([Transaction, IdempotencyRecord])],
     providers: [TransactionService,],
-   controllers: [TransactionController],
+    controllers: [TransactionController],
     exports: [TransactionService]
 })
-export class TransactionModule {}
+export class TransactionModule { }
