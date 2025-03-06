@@ -5,10 +5,13 @@ import { TransactionService } from './transaction.service';
 import { TransactionController } from './transaction.controller';
 import { IdempotencyRecord } from '../idempotency/idempotency.entity';
 import { Transaction } from './transaction.entity';
+import { ClientsModule, Transport } from '@nestjs/microservices';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
 
     imports: [
+        ConfigModule.forRoot({ isGlobal: true }),
         TypeOrmModule.forRoot({
             type: 'postgres',
             host: process.env.DB_HOST,
@@ -21,6 +24,23 @@ import { Transaction } from './transaction.entity';
             synchronize: true
 
         }),
+
+        ClientsModule.register([
+            {
+                name: "KAFKA_SERVICE",
+                transport: Transport.KAFKA,
+                options: {
+                    client: {
+                        clientId: 'transaction-service',
+                        brokers: ['localjost: 9092']
+                    },
+                    consumer: {
+                        groupId: 'transaction-consumer'
+                    }
+                }
+
+            }
+        ]),
 
         TypeOrmModule.forFeature([Transaction, IdempotencyRecord])],
     providers: [TransactionService,],

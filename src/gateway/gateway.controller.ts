@@ -1,48 +1,48 @@
-import {Controller, Post, Get, Body, Query} from "@nestjs/common"
-import { ClientProxy, ClientProxyFactory,Transport } from "@nestjs/microservices"
+import { Controller, Post, Get, Body, Query } from "@nestjs/common"
+import { ClientProxy, ClientProxyFactory, Transport } from "@nestjs/microservices"
 import { lastValueFrom } from "rxjs"
 import { Wallet } from 'src/wallet/wallet.entity';
 
 @Controller()
-export class GatewayController{
+export class GatewayController {
     private walletClient: ClientProxy;
     private transactionClient: ClientProxy
-    constructor(){
+    constructor() {
         this.walletClient = ClientProxyFactory.create({
             transport: Transport.TCP,
-            options:{
+            options: {
                 host: "localhost",
                 port: 3001
             }
         })
 
-        this.transactionClient= ClientProxyFactory.create({
+        this.transactionClient = ClientProxyFactory.create({
             transport: Transport.TCP,
-            options:{
+            options: {
                 host: "localhost",
-                port: 3002,
+                port: parseInt(process.env.TX_PORT!),
             }
         })
     }
 
-    @Post('wallets')
-    async createWallet(@Body() body:{userId: number, currency: string}){
-        const pattern = {cmd : 'createWallet'}
-        const payload = {userId: body.userId, curency: body.currency};
+    @Post('wallet')
+    async createWallet(@Body() body: { userId: number, currency: string }) {
+        const pattern = { cmd: 'createWallet' }
+        const payload = { userId: body.userId, curency: body.currency };
 
         const result = await lastValueFrom(this.walletClient.send(pattern, payload));
         return result
-    } 
-    @Get('wallets')
-    async getWallets(@Query("userId") userId: number){
-        const pattern = {cmd: "getWallets"}
-        const payload = {userId: Number(userId)};
+    }
+    @Get('wallet')
+    async getWallets(@Query("userId") userId: number) {
+        const pattern = { cmd: "getWallets" }
+        const payload = { userId: Number(userId) };
         const result = await lastValueFrom(this.walletClient.send(pattern, payload))
         return result;
     }
-    @Post('wallets/deposit')
-    async deposit(@Body() body: {walletId: string; amount: number; idempotencyKey: string}){
-        const pattern = {cmd: 'deposit'}
+    @Post('wallet/deposit')
+    async deposit(@Body() body: { walletId: string; amount: number; idempotencyKey: string }) {
+        const pattern = { cmd: 'deposit' }
         const payload = {
             walletId: body.walletId,
             amount: body.amount,
@@ -51,14 +51,14 @@ export class GatewayController{
         const result = await lastValueFrom(this.walletClient.send(pattern, payload))
         return result;
     }
-    @Post('wallets/withdraw')
-    async withdrawalsSchema(@Body() body:{walletId: string; amount: number; idempotencyKey: string}){
+    @Post('wallet/withdraw')
+    async withdrawalsSchema(@Body() body: { walletId: string; amount: number; idempotencyKey: string }) {
         const payload = {
             walletId: body.walletId,
             amount: body.amount,
             idempotencyKey: body.idempotencyKey
         }
-        const pattern = {cmd: "withdraw"}
+        const pattern = { cmd: "withdraw" }
 
         const result = await lastValueFrom(this.walletClient.send(pattern, payload))
         return result
@@ -66,9 +66,9 @@ export class GatewayController{
 
     @Post('transaction/transfer')
     async transfer(
-        @Body() body: {fromWalletId : string; toWalletId: string; amount: number; idempotencyKey: string; }
-    ){
-        const pattern = { cmd: "transfer"}
+        @Body() body: { fromWalletId: string; toWalletId: string; amount: number; idempotencyKey: string; }
+    ) {
+        const pattern = { cmd: "transfer" }
         const payload = {
             fromWalletId: body.fromWalletId,
             toWalletId: body.toWalletId,
@@ -80,6 +80,6 @@ export class GatewayController{
 
     }
 
-    
+
 
 }

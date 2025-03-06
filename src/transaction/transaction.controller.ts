@@ -4,15 +4,15 @@ import { MessagePattern, Payload } from '@nestjs/microservices';
 
 @Controller('transaction')
 export class TransactionController {
-    constructor(private readonly transactionService: TransactionService){}
+    constructor(private readonly transactionService: TransactionService) { }
 
 
-    @MessagePattern({ cmd: "transferFunds"})
+    @MessagePattern({ cmd: "transfer" })
     async transferFunds(
-        @Payload() data: {fromWalletId: string, toWalletId: string, amount: number, idempotencyKey: string}
-    ){
+        @Payload() data: { fromWalletId: string, toWalletId: string, amount: number, idempotencyKey: string }
+    ) {
         return await this.transactionService.transferfunds(
-            data.toWalletId, data.toWalletId, data.amount,data.idempotencyKey
+            data.toWalletId, data.toWalletId, data.amount, data.idempotencyKey
         )
     }
 }
