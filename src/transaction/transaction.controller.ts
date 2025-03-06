@@ -7,7 +7,7 @@ export class TransactionController {
     constructor(private readonly transactionService: TransactionService) { }
 
 
-    @MessagePattern({ cmd: "transfer" })
+    @MessagePattern({ cmd: "transferW" })
     async transferFunds(
         @Payload() data: { fromWalletId: string, toWalletId: string, amount: number, idempotencyKey: string }
     ) {

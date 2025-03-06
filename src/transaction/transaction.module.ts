@@ -7,6 +7,8 @@ import { IdempotencyRecord } from '../idempotency/idempotency.entity';
 import { Transaction } from './transaction.entity';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { ConfigModule } from '@nestjs/config';
+import { Wallet } from 'src/wallet/wallet.entity';
+import { User } from 'src/users/user.entity';
 
 @Module({
 
@@ -42,7 +44,7 @@ import { ConfigModule } from '@nestjs/config';
             }
         ]),
 
-        TypeOrmModule.forFeature([Transaction, IdempotencyRecord])],
+        TypeOrmModule.forFeature([Transaction, IdempotencyRecord, Wallet, User])],
     providers: [TransactionService,],
     controllers: [TransactionController],
     exports: [TransactionService]
