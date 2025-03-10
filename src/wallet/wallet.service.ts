@@ -41,8 +41,8 @@ export class WalletService {
     }
 
     async deposit(walletid: string, amount: number, idempotencyKey: string) {
-        this.logger.log(amount)
-        try {
+        
+        
             if (amount <= 0) {
                 throw new BadGatewayException("Amount must be greater than zero")
             }
@@ -89,11 +89,8 @@ export class WalletService {
             })
 
             return updatedWallet
-        }
-        catch (error) {
-            this.logger.error(error.stack)
-            throw error
-        }
+        
+     
 
 
 

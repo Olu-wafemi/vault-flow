@@ -22,7 +22,7 @@ export class WalletController {
     async deposit(
         @Payload() data: {walletId: string, amount: number, idempotencyKey: string}
     ){
-        return this.walletService.withdraw(data.walletId, data.amount, data.idempotencyKey);
+        return this.walletService.deposit(data.walletId, data.amount, data.idempotencyKey);
         
     }
 
