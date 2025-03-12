@@ -4,7 +4,7 @@ import { AppService } from './app.service';
 import {ConfigModule} from '@nestjs/config'
 import {TypeOrmModule} from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
-import { JwtStrategy } from './jwt.strategy/jwt.strategy';
+import { JwtStrategy } from './Strategy/jwt.strategy';
 import { User } from './users/user.entity'; 
 import { UsersModule } from './users/users.module';
 import { WalletModule } from './wallet/wallet.module';
