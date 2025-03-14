@@ -9,12 +9,12 @@ async function bootstrap() {
         transport: Transport.TCP,
         options: {
             host: "localhost",
-            port: parseInt(process.env.TX_PORT!)
+            port: 3002
         }
 
     })
 
     await app.listen()
-    console.log(`Transaction Microservice is listening ${process.env.TX_PORT!}`)
+    console.log(`Transaction Microservice is listening ${3002}`)
 }
 bootstrap()
