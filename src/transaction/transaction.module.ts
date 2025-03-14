@@ -34,7 +34,7 @@ import { User } from 'src/users/user.entity';
                 options: {
                     client: {
                         clientId: 'transaction-service',
-                        brokers: ['localjost: 9092']
+                        brokers: ['localhost: 9092']
                     },
                     consumer: {
                         groupId: 'transaction-consumer'

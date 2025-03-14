@@ -12,6 +12,7 @@
     "start:dev": "nest start --watch",
     "start:wallet": "nest start --entryFile=wallet/wallet.main",
     "start:transaction": "nest start --entryFile=transaction/transaction.main",
+    "start:transaction-history": "nest start --entryFile=transaction-history/transaction-history.main",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
