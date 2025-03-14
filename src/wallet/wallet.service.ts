@@ -80,8 +80,8 @@ export class WalletService {
                 await this.cacheManager.del(`wallets:${walletEntity?.userId}`)
             }
 
-            this.kafkaClient.emit('tranaction_event', {
-                userid: walletEntity?.userId,
+            this.kafkaClient.emit('transaction_event', {
+                userId: walletEntity?.userId,
                 type: 'deposit',
                 walletid,
                 amount,

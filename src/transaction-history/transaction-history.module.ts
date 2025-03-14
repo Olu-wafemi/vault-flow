@@ -29,7 +29,7 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
                 options:{
                     client:{
                         clientId: 'transaction-history-service',
-                        brokers: ['localhost: 9092']
+                        brokers: ['localhost:9092']
                     },
                     consumer:{
                         groupId: 'transaction-history-group'

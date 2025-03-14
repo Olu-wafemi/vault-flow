@@ -1,20 +1,28 @@
 import { NestFactory } from "@nestjs/core";
 import { MessagePattern, MicroserviceOptions, Transport } from "@nestjs/microservices";
 import { TransactionHistoryModule } from "./transaction-history.module";
+import { AllExceptionFilter } from "src/exception";
 
 
 async function bootstrap() {
     const app = await NestFactory.createMicroservice<MicroserviceOptions>(TransactionHistoryModule, {
 
-        transport: Transport.TCP,
-        options: {
-            host: "localhost",
-            port: 3003
+        transport: Transport.KAFKA,
+        options:{
+          client:{
+            clientId: 'transaction-history-service',
+            brokers: ['localhost:9092']
+          },
+          consumer: {
+            groupId: 'transaction-history-group'
+          }
         }
-
     })
+    app.useGlobalFilters(new AllExceptionFilter())
 
     await app.listen()
-    console.log(`Transaction Microservice is listening ${3003}`)
+    console.log(`Transaction History Microservice is listening ${3003}`)
+
+    
 }
 bootstrap()
