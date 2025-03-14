@@ -8,7 +8,7 @@ export class TransactionHistoryKafkaController {
 
     constructor(private transactionHistoryService: TransactionHistoryService){}
 
-    @MessagePattern({ topic: 'transaction_event'})
+    @MessagePattern({ topic: "transaction_event" })
     async handleTransactionEvent(@Payload() message: any){
         this.logger.log(`Received transaction event": ${JSON.stringify(message.value)}`)
         await this.transactionHistoryService.createTransaction(message.value)
