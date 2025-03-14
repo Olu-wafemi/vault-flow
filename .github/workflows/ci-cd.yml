@@ -1,0 +1,58 @@
+name: CI/CD Pipeline
+
+on:
+    push:
+        branches: [main]
+    pull_request:
+        branches: [main]
+jobs:
+    build-and-test:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout Code
+              uses: actions/checkout@v3
+
+            - name: Set up Node.js
+              uses: actions/setup-node@v3
+              with:
+                node-version: '18'
+            
+            - name: Install Dependencies
+              run: npm install
+
+            - name: Run Unit Tests
+              run: npm run test 
+            
+            - name: Build Application
+              run : npm run build
+            
+            - name: Build Docker Image for Auth Service
+              run: docker build -t effemm/vaultflow-auth:latest -f Dockerfile.auth .
+
+            - name: Build Docker Image for Wallet Service
+              run: docker build -t effemm/vaultflow-wallet:latest -f Dockerfile.wallet .
+            
+            - name: Build Docker Image for Transaction Service
+              run: docker build -t effemm/vaultflow-transaction:latest -f Dockerfile.transaction .
+
+
+            - name: Build Docker Image for Transaction History Service 
+              run: docker build -t effemm/vaultflow-transaction-history:latest -f Dockerfile.transaction-history .
+
+            - name: Log in to Docker Hub
+              uses: docker/login-action@v2
+              with:
+                username: ${{ secrets.DOCKERHUB_USERNAME }}
+                password: ${{ secrets. DOCKERHUB_PASSWORD }}
+
+            - name: Push Docker Images
+              run: |
+                 docker push effemm/vaultflow-auth:latest 
+                 docker push effemm/vaultflow-wallet:latest
+                 docker push effemm/vaultflow-transaction:latest
+                 docker push effemm/vaultflow-transaction-history:latest
+    deploy:
+        needs: build-and-test
+        runs-on: ubuntu-latest
+        
