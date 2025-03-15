@@ -10,7 +10,7 @@ env:
   GAR_LOCATION: us-central1
   REPO_NAME: vaultflow-repo
   SERVICE_ACCOUNT: ${{ secrets.GCP_SA_KAY }}
-  AUTH_SERVICE_NAME: suth-service
+  AUTH_SERVICE_NAME: auth-service
   TRANSACTION_SERVICE_NAME: transaction-service
 jobs:
   build-and-deploy:
