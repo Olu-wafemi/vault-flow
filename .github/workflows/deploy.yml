@@ -1,0 +1,53 @@
+name: Deploy to GCP
+
+on:
+    push:
+        branches: [main]
+    pull_request:
+        branches: [main]
+env:
+  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+  GAR_LOCATION: us-central1
+  REPO_NAME: vaultflow-repo
+  SERVICE_ACCOUNT: ${{ secrets.GCP_SA_KAY }}
+  AUTH_SERVICE_NAME: suth-service
+  TRANSACTION_SERVICE_NAME: transaction-service
+jobs:
+  build-and-deploy:
+    name: Build & Deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Authenticate with GCP
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KAY }}
+      - name: Build & Push Auth Service
+        run: |
+          docker build -t $GAR_LOCATION-docker.pkg.dev/$PROJECT_ID/$REPO_NAME/$AUTH_SERVICE_NAME:latest ./auth
+          docker push $GAR_LOCATION-docker.pkg.dev/$PROJECT_ID/$REPO_NAME/$TRANSACTION_SERVICE_NAME:latest
+
+      - name: Build & Push Transaction Service
+        run: |
+          docker build -t $GAR_LOCATION-docker.pkg.dev/$PROJECT_ID/$REPO_NAME/$TRANSACTION_SERVICE_NAME:latest ./transaction
+          docker push $GAR_LOCATION-docker.pkg.dev/$PROJECT_ID/$REPO_NAME/$TRANSACTION_SERVICE_NAME:latest
+
+      - name: Deploy Auth Service to CLoud Run
+        run: |
+          gcloud run deploy $AUTH_SERVICE_NAME \
+            --image $GAR_LOCATION-docker.pkg.dev/$PROJECT_ID/$REPO_NAME/$AUTH_SERVICE:latest \
+            --platform managed \
+            --region $GAR_LOCATION \
+            --allow-unauthenticated
+
+      - name: Deploy Transaction Serice to Cloud Run
+        run: |
+          gcloud run deploy $TRANSACTION_SERVICE_NAME \
+          --image $GAR_LOCATION-docker.pkg.dev/$PROJECT_ID/$REPO_NAME/$TRANSACTION_SERVICE_NAME:latest \
+          --platform managed \
+          --region $GAR_LOCATION \
+          --allow-unauthenticated
+
