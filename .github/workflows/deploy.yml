@@ -25,25 +25,28 @@ jobs:
         uses: google-github-actions/auth@v2
         with:
           credentials_json: ${{ secrets.GCP_SA_KAY }}
+
+      - name: Authenticate Docker to Google Artifact Registry
+        run: gcloud auth configure-docker $GAR_LOCATION-docker.pkg.dev
       - name: Build & Push Auth Service
         run: |
-          docker build -t $GAR_LOCATION-docker.pkg.dev/$PROJECT_ID/$REPO_NAME/$AUTH_SERVICE_NAME:latest ./auth
-          docker push $GAR_LOCATION-docker.pkg.dev/$PROJECT_ID/$REPO_NAME/$TRANSACTION_SERVICE_NAME:latest
+          docker build -t $GAR_LOCATION-docker.pkg.dev/$PROJECT_ID/$REPO_NAME/$AUTH_SERVICE_NAME:latest -f Dockerfile.auth .
+          docker push $GAR_LOCATION-docker.pkg.dev/$PROJECT_ID/$REPO_NAME/$AUTH_SERVICE_NAME:latest
 
       - name: Build & Push Transaction Service
         run: |
-          docker build -t $GAR_LOCATION-docker.pkg.dev/$PROJECT_ID/$REPO_NAME/$TRANSACTION_SERVICE_NAME:latest ./transaction
+          docker build -t $GAR_LOCATION-docker.pkg.dev/$PROJECT_ID/$REPO_NAME/$TRANSACTION_SERVICE_NAME:latest -f Dockerfile.transaction .
           docker push $GAR_LOCATION-docker.pkg.dev/$PROJECT_ID/$REPO_NAME/$TRANSACTION_SERVICE_NAME:latest
 
       - name: Deploy Auth Service to CLoud Run
         run: |
           gcloud run deploy $AUTH_SERVICE_NAME \
-            --image $GAR_LOCATION-docker.pkg.dev/$PROJECT_ID/$REPO_NAME/$AUTH_SERVICE:latest \
+            --image $GAR_LOCATION-docker.pkg.dev/$PROJECT_ID/$REPO_NAME/$AUTH_SERVICE_NAME:latest \
             --platform managed \
             --region $GAR_LOCATION \
             --allow-unauthenticated
 
-      - name: Deploy Transaction Serice to Cloud Run
+      - name: Deploy Transaction Service to Cloud Run
         run: |
           gcloud run deploy $TRANSACTION_SERVICE_NAME \
           --image $GAR_LOCATION-docker.pkg.dev/$PROJECT_ID/$REPO_NAME/$TRANSACTION_SERVICE_NAME:latest \
