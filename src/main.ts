@@ -8,8 +8,8 @@ async function bootstrap() {
   app.useGlobalFilters(new AllExceptionFilter())
 
 
-  await app.listen( process.env.PORT || 8080);
+  await app.listen(process.env.PORT || 8080);
 }
 
 
-bootstrap();
+bootstrap(); 

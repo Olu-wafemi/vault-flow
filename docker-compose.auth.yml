@@ -1,0 +1,16 @@
+
+services:
+  auth-service:
+    build:
+      context: .
+      dockerfile: Dockerfile.auth
+    container_name: auth-service
+    ports:
+      - "8080:8080"
+    environment:
+      - PORT=8080
+      - NODE_ENV=production
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    restart: always
