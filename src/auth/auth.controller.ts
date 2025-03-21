@@ -1,8 +1,9 @@
-import { Controller, Post, Body, Req, UseGuards } from '@nestjs/common';
+import { Controller, Post, Body, Req, UseGuards, Get } from '@nestjs/common';
 import { AuthService } from './auth.service'; 
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
+//import { AuthGuard } from './auth.guard';
 
-
+import { AuthGuard } from '@nestjs/passport';
 
 
 @Controller('auth')
@@ -18,6 +19,12 @@ export class AuthController {
     @Post('login')
     async login(@Body() body: {email: string, password: string}){
        return this.authService.login(body)
+
+    }
+
+    @UseGuards(AuthGuard('google'))
+    @Get('google')
+    googleLogin(){
 
     }
 
