@@ -6,7 +6,10 @@ import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { AuthGuard } from '@nestjs/passport';
 
 
-@Controller('auth')
+@Controller({
+    version: "1",
+    path: 'auth'
+})
 export class AuthController {
     constructor(private readonly authService: AuthService){}
 
