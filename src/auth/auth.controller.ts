@@ -31,6 +31,12 @@ export class AuthController {
 
     }
 
+    @UseGuards(AuthGuard('google'))
+    @Get('google/callback')
+    async googleCallback(@Req() req){
+        return this.authService.googleCallback(req.user);
+    }
+
     @Post('refresh')
     async refreshToken(@Body('refreshToken') refreshToken:string, @Req() req){
         return this.authService.refreshToken(req.user.id, refreshToken)
