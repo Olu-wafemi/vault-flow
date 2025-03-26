@@ -15,3 +15,13 @@ export class FacebookStrategy extends PassportStrategy(Strategy, 'facebook') {
       scope: ["email"]
     });
   }
+
+  async validate(
+    accessToken: string,
+    refreshToken: string,
+    profile: any,
+    done: VerifiedCallback,
+
+  ){
+    const {name, emails, photos} = profile
+  }
